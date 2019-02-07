@@ -31,6 +31,24 @@ public class JsonRendererApplicationTests {
 
 	private static final String FORM_ID = "c63ce050-24a6-11e9-8a68-e4b97a06e9ac";
 
+	@Test
+	public void testGetFormModel() throws Exception {
+		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
+		assertNotNull(formModel);
+		assertNotNull(formModel.getFields());
+		assertEquals(FORM_ID, formModel.getId());
+		printForm(formModel);
+	}
+
+	@Test
+	public void testGetForm() throws Exception {
+		System.out.println("-----------------FORM TEST 3---------------");
+		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
+		assertNotNull(formModel);
+		System.out.println(formModel);
+		System.out.println("--------------------------------------------");
+		System.out.println("--------------------------------------------");
+	}
 
 	protected void printForm(SimpleFormModel model) {
 		System.out.println("--------------------------------------------");
@@ -48,25 +66,6 @@ public class JsonRendererApplicationTests {
 			System.out.println("-------ID : " + field.getId());
 			System.out.println("--------------------------------------------");
 		}
-		System.out.println("--------------------------------------------");
-		System.out.println("--------------------------------------------");
-	}
-
-	@Test
-	public void testGetFormModel() throws Exception {
-		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
-		assertNotNull(formModel);
-		assertNotNull(formModel.getFields());
-		assertEquals(FORM_ID, formModel.getId());
-		printForm(formModel);
-	}
-
-	@Test
-	public void testGetForm() throws Exception {
-		System.out.println("-----------------FORM TEST 3---------------");
-		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
-		assertNotNull(formModel);
-		System.out.println(formModel);
 		System.out.println("--------------------------------------------");
 		System.out.println("--------------------------------------------");
 	}

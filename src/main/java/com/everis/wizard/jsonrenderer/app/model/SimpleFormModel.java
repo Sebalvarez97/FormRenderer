@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.form.api.FormModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -97,6 +98,7 @@ public class SimpleFormModel implements FormModel {
      *
      * @return The top level fields, a container's sub fields are not returned.
      */
+    
     public List<FormField> getFields() {
         return fields;
     }

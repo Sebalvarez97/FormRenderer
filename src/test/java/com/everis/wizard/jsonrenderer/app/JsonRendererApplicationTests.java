@@ -29,7 +29,7 @@ public class JsonRendererApplicationTests {
 	@Autowired
 	private FormService formService;
 
-	private static final String FORM_ID = "c63ce050-24a6-11e9-8a68-e4b97a06e9ac";
+	private static final String FORM_ID = "cfc9fe44-2491-11e9-b11a-8640bb615615";
 
 	@Test
 	public void testGetFormModel() throws Exception {
@@ -43,9 +43,9 @@ public class JsonRendererApplicationTests {
 	@Test
 	public void testGetForm() throws Exception {
 		System.out.println("-----------------FORM TEST 3---------------");
-		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
-		assertNotNull(formModel);
-		System.out.println(formModel);
+		String HtmlModel = formService.getForm(FORM_ID);
+		assertNotNull(HtmlModel);
+		System.out.println(HtmlModel);
 		System.out.println("--------------------------------------------");
 		System.out.println("--------------------------------------------");
 	}

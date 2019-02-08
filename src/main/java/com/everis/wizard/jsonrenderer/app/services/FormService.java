@@ -16,7 +16,7 @@ public class FormService {
 	@Autowired
 	private FormRenderer formRenderer;
 
-	private static final String BASE_URL = "http://admin:test@192.168.1.135:8080";
+	private static final String BASE_URL = "http://admin:test@192.168.1.133:8080";
 
 	private static final String FORM_REPOSITORY_URL = "flowable-task/form-api/form-repository/form-definitions";
 

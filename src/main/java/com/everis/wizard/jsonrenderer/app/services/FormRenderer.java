@@ -3,6 +3,7 @@ package com.everis.wizard.jsonrenderer.app.services;
 import org.springframework.stereotype.Service;
 
 import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
+import com.everis.wizard.jsonrenderer.app.model.ExpressionFormField;
 import com.everis.wizard.jsonrenderer.app.model.FormField;
 import com.everis.wizard.jsonrenderer.app.model.FormFieldTypes;
 import com.everis.wizard.jsonrenderer.app.model.OptionFormField;
@@ -68,49 +69,98 @@ public class FormRenderer {
 	protected static Tag HtmlFactory(FormField field) {
 		switch(field.getType()) {
 		case "expression":
-			return div(
-					label(field.getExpression())
-						.withType(field.getType())
-    			        .withId(field.getId())
-    			        .withCondRequired(field.isRequired())
-					);
+			return expression((ExpressionFormField) field);
 		case "dropdown":
-			OptionFormField optionfield = (OptionFormField) field;
-			return div(
-					label(field.getName())
-					 .attr("for",field.getId()),
-					 br(),
-					 select(
-							 each(optionfield.getOptions(), option ->
-							 		option(option.getName())
-							 		.withValue(option.getName())
-									 )
-							 ).withId(field.getId())
-				 			  .withCondRequired(field.isRequired())
-					);
+			return dropdown((OptionFormField) field);
 		case "boolean" :
-			field.setType("checkbox");
-			return HtmlFactory(field);
+			return checkbox(field);
+		case "radio-buttons" :
+			return radiobutton((OptionFormField) field);
 		case "integer" :
-			field.setType("number");
-			return HtmlFactory(field);
+			return number(field);
 		case "decimal" :
-			field.setType("number");
-			return HtmlFactory(field);
-		case "amount" :
-			field.setType("number");
-			return HtmlFactory(field);
+			return number(field);
+		case "multi-line-text" :
+			return textArea(field);
 		default :
-			return div(
-						label(field.getName())
-						 .attr("for",field.getId()),
-						 br(),
-						 input()
-							.withType(field.getType())
-							.withId(field.getId())
-		   			        .withPlaceholder(field.getPlaceholder())
-		   			        .withCondRequired(field.isRequired())
-					);
+			return commoninput(field);
 		}
+	}
+	
+	private static Tag dropdown(OptionFormField field) {
+		return div(
+				inputTitle(field),
+				 br(),
+				 select(
+						 each(field.getOptions(), option ->
+						 		option(option.getName())
+						 		.withValue(option.getName())
+						 		.withName(field.getName())
+								 )
+						 ).withId(field.getId())
+			 			  .withCondRequired(field.isRequired())
+				);
+	} 
+	
+	private static Tag inputTitle(FormField field) {
+		return label(field.getName())
+				 .attr("for",field.getId());
+	}
+	
+	private static Tag textArea(FormField field) {
+		return div(
+				inputTitle(field),
+				 br(),
+				 textarea()
+				);
+	}
+	
+	private static Tag expression(ExpressionFormField field) {
+		return div(
+				label(field.getExpression())
+					.withType(field.getType())
+			        .withId(field.getId())
+			        .withCondRequired(field.isRequired())
+				);
+	}
+	
+	private static Tag radiobutton(OptionFormField field) {
+		field.setType("radio");
+		return div(
+				inputTitle(field),
+				 br(),
+					 each(field.getOptions(), option ->
+				 		div(
+				 			input()
+						 		.withType(field.getType())
+						 		.withValue(option.getName())
+						 		.withName(field.getName())
+						 		,label(option.getName())
+						 		,br()
+						 		)
+						 )
+				).withId(field.getId())
+	 			  .withCondRequired(field.isRequired());
+	}
+	
+	private static Tag checkbox(FormField field) {
+		field.setType("checkbox");
+		return commoninput(field);
+	}
+	private static Tag number(FormField field) {
+		field.setType("number");
+		return commoninput(field);
+	}
+	
+	private static Tag commoninput(FormField field) {
+		return div(
+				inputTitle(field),
+				 br(),
+				 input()
+					.withType(field.getType())
+					.withId(field.getId())
+   			        .withPlaceholder(field.getPlaceholder())
+   			        .withCondRequired(field.isRequired())
+			);
 	}
 }

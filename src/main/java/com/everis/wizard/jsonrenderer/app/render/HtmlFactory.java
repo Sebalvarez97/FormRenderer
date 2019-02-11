@@ -52,14 +52,15 @@ public class HtmlFactory {
 	} 
 	
 	private static Tag inputTitle(FormField field) {
-		return label(field.getName())
-				 .attr("for",field.getId());
+		return div(
+				label(field.getName())
+				 .attr("for",field.getId())
+				 ,br());
 	}
 	
 	private static Tag textArea(FormField field) {
 		return div(
 				inputTitle(field),
-				 br(),
 				 textarea()
 				 .withCondRequired(field.isRequired())
 				);
@@ -76,13 +77,12 @@ public class HtmlFactory {
 		field.setType("radio");
 		return div(
 				inputTitle(field),
-				 br(),
 					 each(field.getOptions(), option ->
 				 		div(
 				 			input()
 						 		.withType(field.getType())
 						 		.withValue(option.getName())
-						 		.withName(field.getName())	
+						 		.withName(field.getName())
 						 		,label(option.getName())
 						 		,br()
 						 		)
@@ -103,16 +103,16 @@ public class HtmlFactory {
 	private static Tag inputt(FormField field) {
 		return div(
 				inputTitle(field),
-				 br(),
 				 input()
 					.withType(field.getType())
    			        .withPlaceholder(field.getPlaceholder())
-   			        .condAttr(
-   			        		field.getParam("minLength") != null,
-   			        		"minlenght", (String) field.getParam("minLength"))
-   			        .condAttr(
-			        		field.getParam("maxLength") != null,
-			        		"maxlenght", (String) field.getParam("maxLength"))
+   			        .condAttr(field.getParam("regexPattern") != null,
+   			        		"pattern", (String) field.getParam("regexPattern")).condAttr(
+   		   			        		field.getParam("minLength") != null,
+   		   			        		"minlenght", (String) field.getParam("minLength"))
+   		   			        .condAttr(
+   					        		field.getParam("maxLength") != null,
+   					        		"maxlenght", (String) field.getParam("maxLength"))
    			        .withCondRequired(field.isRequired())
 			);
 	}

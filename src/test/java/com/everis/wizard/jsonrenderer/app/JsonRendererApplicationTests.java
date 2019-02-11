@@ -29,7 +29,7 @@ public class JsonRendererApplicationTests {
 	@Autowired
 	private FormService formService;
 
-	private static final String FORM_ID = "82f28b91-2bb1-11e9-908c-8640bb615615";
+	private static final String FORM_ID = "e2fc16d9-2e00-11e9-849d-8640bb615615";
 
 	@Test
 	public void testGetFormModel() throws Exception {
@@ -64,6 +64,11 @@ public class JsonRendererApplicationTests {
 			System.out.println("-------NAME : " + field.getName());
 			System.out.println("-------TYPE : " + field.getType());
 			System.out.println("-------ID : " + field.getId());
+			System.out.println("--------------------------------------------");
+			System.out.println("-------PATTERN : " + field.getParam("regexPattern"));
+			System.out.println("-------PLACEHOLDER : " + field.getPlaceholder());
+			System.out.println("-------LAYOUR : " + field.getLayout().toString());
+			System.out.println("-------VALUE : " + field.getValue());
 			System.out.println("--------------------------------------------");
 		}
 		System.out.println("--------------------------------------------");

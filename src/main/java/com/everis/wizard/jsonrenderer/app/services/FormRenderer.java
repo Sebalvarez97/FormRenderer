@@ -3,31 +3,30 @@ package com.everis.wizard.jsonrenderer.app.services;
 import org.springframework.stereotype.Service;
 
 import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
-import com.everis.wizard.jsonrenderer.app.model.ExpressionFormField;
-import com.everis.wizard.jsonrenderer.app.model.FormField;
-import com.everis.wizard.jsonrenderer.app.model.FormFieldTypes;
-import com.everis.wizard.jsonrenderer.app.model.OptionFormField;
+
 
 import static  com.everis.wizard.jsonrenderer.app.render.HtmlFactory.*;
 import static j2html.TagCreator.*;
 
+import java.util.Map;
+
 @Service
 public class FormRenderer {
 
-	private String pageTitle = "TestPage";
-
-	public String getHtmlForm(SimpleFormModel formModel) {
+	/*
+	 Gets a SimpleFormModel and a Map of Attributes
+	 Attributes:
+	 	pageTitle: title of the page (String)
+	*/
+	public String getHtmlForm(SimpleFormModel formModel, Map<String, Object> pageAttr) {
 		return document(
 	            html(
 	                head(
-	                    title(pageTitle),
-	                    link().withRel("stylesheet")
-	                    .withHref("https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css")
+	                    title((String) pageAttr.get("pageTitle"))
 	                ),
 	                body(
 	                    header(
-	                        h1(formModel.getName())
-	                        .withClass("display-2")
+	                    	h1(formModel.getName())
 	                    ),
 	                    main(
 	                        //the view from the partials example
@@ -36,16 +35,13 @@ public class FormRenderer {
 	                				.with(
 	                					each(formModel.getFields(), field ->
             									formfield(field)
-            									.withClass("form-group")
                 							),
-	                					button("Submit").withType("submit")
+	                					input()
+	                						  .withType("submit")
+	                						  .withValue("Enter")
 	                					)
-		                			.withClass("form-horizontal")
-		                			.withRole("form")
-		                			.withMethod("post")
 		                			.withId(formModel.getId())
             			    )
-	                		.withClass("jumbotron")
 	                    ),
 	                    footer(
 	                        

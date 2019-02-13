@@ -59,7 +59,7 @@ public class JsonRendererApplicationTests {
 	public void testGetForm() throws Exception {
 		//System.out.println("--------------------HTML-------------------");
 		//System.out.println("-------------------------------------------");
-		String HtmlModel = formService.getForm(FORM_ID);
+		String HtmlModel = formService.getFormById(FORM_ID);
 		assertNotNull(HtmlModel);
 		//System.out.println(HtmlModel);
 		//System.out.println("--------------------------------------------");

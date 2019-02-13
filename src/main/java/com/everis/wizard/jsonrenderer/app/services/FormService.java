@@ -52,11 +52,15 @@ public class FormService implements IFormService {
 	 		formAction: action to set in the submit button (String)
 	 		formMethod: method to set in the submit button (String)
 	*/
-	public String getForm(String formId) throws FormServiceException {
+	public String getFormById(String formId) throws FormServiceException {
 		SimpleFormModel formModel = getFormModel(formId);
 		Map<String, Object> htmlmodel = new HashMap<String, Object>();
 		htmlmodel.put("pageTitle", "TestPage");
 		return formRenderer.getHtmlForm(formModel, htmlmodel);
+	}
+	
+	public String getFormByKey(String formKey) throws FormServiceException {
+		return "";
 	}
 
 	public SimpleFormModel getFormModel(String formId) throws FormServiceException {
@@ -92,7 +96,6 @@ public class FormService implements IFormService {
 			models.add(formModel);
 		}
 		return models;
-
 	}
 
 	private String AllFormsURL() {

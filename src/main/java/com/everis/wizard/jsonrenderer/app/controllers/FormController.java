@@ -19,7 +19,19 @@ public class FormController {
 	@GetMapping(path = "/form/{formId}")
 	public @ResponseBody ResponseEntity<String> getForm(@PathVariable String formId) {
 		try {
-			String form = formService.getForm(formId);
+			String form = formService.getFormById(formId);
+			return ResponseEntity
+					.ok()
+					.body(form);
+		}catch(Exception ex) {
+			return ResponseEntity.status(204).build();
+		}
+	}
+	
+	@GetMapping(path = "/form/{formkey}")
+	public @ResponseBody ResponseEntity<String> getFormByKey(@PathVariable String formKey) {
+		try {
+			String form = formService.getFormByKey(formKey);
 			return ResponseEntity
 					.ok()
 					.body(form);

@@ -62,7 +62,31 @@ public class FormService implements IFormService {
 	public String getFormByKey(String formKey) throws FormServiceException {
 		return getFormById(getByKey(formKey).getId());
 	}
+	
+	public String getFormByTaskId(String taskId)  throws FormServiceException {
+		SimpleFormModel formModel = getFormModelByTaskId(taskId);
+		Map<String, Object> htmlmodel = new HashMap<String, Object>();
+		htmlmodel.put("pageTitle", "Wizard");
+		return formRenderer.getHtmlForm(formModel, htmlmodel);
+		
+	}
+	
+	public SimpleFormModel getFormModelByTaskId(String taskId) throws FormServiceException{
+		
+		String testJsonResource = null;
+		String formURL = FormByTask(taskId);
+		try {
+			testJsonResource = Unirest.get(formURL).asJson().getBody().getObject().toString();
+		} catch (UnirestException e) {
+			throw new FormServiceException("Fail to get JSON from URL: " + formURL, e.getCause());
+		}
+		return new FormJsonConverter().convertToFormModel(testJsonResource);
+		
+	}
 
+
+
+	
 	public SimpleFormModel getFormModel(String formId) throws FormServiceException {
 		String testJsonResource = null;
 		String formURL = FormUrl(formId);
@@ -79,6 +103,7 @@ public class FormService implements IFormService {
 		HttpResponse<JsonNode> result;
 		try {
 			result = Unirest.get(AllFormsURL()).asJson();
+			System.out.println(result);
 		} catch (UnirestException e) {
 			throw new FormServiceException("Fail to get JSON Array", e.getCause());
 		}
@@ -90,6 +115,7 @@ public class FormService implements IFormService {
 		}
 		return models;
 	}
+	
 	
 	private SimpleFormModel getByKey(String formKey) throws FormServiceException {
 		SimpleFormModel form = null;
@@ -108,6 +134,15 @@ public class FormService implements IFormService {
 		return form;
 	}
 
+	
+	private String TASK_URL = "flowable-rest/service/runtime/tasks";
+	private String TASK_FORM = "form";
+	
+	private String FormByTask(String taskId) {
+		return String.format("%s/%s/%s/%s", BASE_URL, TASK_URL, taskId, TASK_FORM);
+		
+	}
+	
 	private String FormUrl(String id) throws FormServiceException {
 		if (id == null) {
 			throw new FormServiceException("Null Id Exception");

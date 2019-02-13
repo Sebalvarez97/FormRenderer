@@ -43,7 +43,7 @@ public class JsonRendererApplicationTests {
 		assertNotNull(formModel);
 		assertNotNull(formModel.getFields());
 		assertEquals(FORM_ID, formModel.getId());
-		printForm(formModel);
+		//printForm(formModel);
 	}
 	
 	@Test
@@ -57,13 +57,13 @@ public class JsonRendererApplicationTests {
 
 	@Test
 	public void testGetForm() throws Exception {
-		System.out.println("--------------------HTML-------------------");
-		System.out.println("-------------------------------------------");
-		String HtmlModel = formService.getForm(FORM_ID);
+		//System.out.println("--------------------HTML-------------------");
+		//System.out.println("-------------------------------------------");
+		String HtmlModel = formService.getFormById(FORM_ID);
 		assertNotNull(HtmlModel);
-		System.out.println(HtmlModel);
-		System.out.println("--------------------------------------------");
-		System.out.println("--------------------------------------------");
+		//System.out.println(HtmlModel);
+		//System.out.println("--------------------------------------------");
+		//System.out.println("--------------------------------------------");
 	}
 
 	protected void printForm(SimpleFormModel model) {

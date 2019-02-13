@@ -33,12 +33,34 @@ public class FormService implements IFormService {
 
 	@Value("${application.formservice.modelUrl}")
 	private String FORM_MODEL_URL;
-
-	public String getForm(String formId) throws FormServiceException {
+	
+	/*
+	 Gets a SimpleFormModel and a Map of Attributes
+	 Attributes:
+	 	obligatory:
+	 		pageTitle: title of the page (String)
+	 	optional:
+	 		stylesheets: List of style sheets sources to add (String)
+	 		scripts: List of scripts to use as String (List<String>)
+	 		scriptSrc: List of script sources to add (List<String>)
+	 		
+	 		submitbuttonClass: class to set in the submit button (String)
+	 		submitbuttonAction: action to set in the submit button (String)
+	 		submitbuttonMethod: method to set in the submit button (String)
+	 		
+	 		formClass: class to set in the submit button (String)
+	 		formAction: action to set in the submit button (String)
+	 		formMethod: method to set in the submit button (String)
+	*/
+	public String getFormById(String formId) throws FormServiceException {
 		SimpleFormModel formModel = getFormModel(formId);
 		Map<String, Object> htmlmodel = new HashMap<String, Object>();
 		htmlmodel.put("pageTitle", "TestPage");
 		return formRenderer.getHtmlForm(formModel, htmlmodel);
+	}
+	
+	public String getFormByKey(String formKey) throws FormServiceException {
+		return "";
 	}
 
 	public SimpleFormModel getFormModel(String formId) throws FormServiceException {
@@ -74,7 +96,6 @@ public class FormService implements IFormService {
 			models.add(formModel);
 		}
 		return models;
-
 	}
 
 	private String AllFormsURL() {

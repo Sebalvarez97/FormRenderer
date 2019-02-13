@@ -7,6 +7,11 @@ import static j2html.TagCreator.label;
 import static j2html.TagCreator.option;
 import static j2html.TagCreator.select;
 import static j2html.TagCreator.textarea;
+import static j2html.TagCreator.script;
+import static j2html.TagCreator.link;
+
+import java.util.List;
+
 import static j2html.TagCreator.h1;
 import static j2html.TagCreator.h2;
 import static j2html.TagCreator.h3;
@@ -22,6 +27,30 @@ import j2html.tags.Tag;
 
 public class HtmlFactory {
 
+	public static Tag scripts(List<String> scripts) {
+		return div(
+					each(scripts, script ->
+						script(script)
+							)
+				);
+	}
+	
+	public static Tag scriptSrc(List<String> scriptsrc) {
+		return div(
+					each(scriptsrc, script ->
+						script().withSrc(script)
+							)
+				);
+	}
+	
+	public static Tag stylesheets(List<String> stylesheets) {
+		return div(
+					each(stylesheets, stylesheetsrc ->
+						link().withRel("stylesheet").withSrc(stylesheetsrc)
+							)
+				);
+	}
+	
 	public static Tag formfield(FormField field) {
 		switch(field.getType()) {
 		case "expression":

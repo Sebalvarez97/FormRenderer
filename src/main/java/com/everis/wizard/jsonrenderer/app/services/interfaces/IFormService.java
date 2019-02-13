@@ -7,7 +7,9 @@ import com.everis.wizard.jsonrenderer.app.services.exceptions.FormServiceExcepti
 
 public interface IFormService {
 
-	public String getForm(String formId) throws FormServiceException;
+	public String getFormById(String formId) throws FormServiceException;
+	
+	public String getFormByKey(String formKey) throws FormServiceException;
 	
 	public SimpleFormModel getFormModel(String formId) throws FormServiceException;
 	

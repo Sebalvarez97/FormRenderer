@@ -1,13 +1,9 @@
 package com.everis.wizard.jsonrenderer.app.services;
 
 import org.springframework.stereotype.Service;
-
 import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
-
-
 import static  com.everis.wizard.jsonrenderer.app.render.HtmlFactory.*;
 import static j2html.TagCreator.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

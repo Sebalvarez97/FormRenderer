@@ -52,11 +52,15 @@ public class FormService implements IFormService {
 	 		formAction: action to set in the submit button (String)
 	 		formMethod: method to set in the submit button (String)
 	*/
-	public String getForm(String formId) throws FormServiceException {
+	public String getFormById(String formId) throws FormServiceException {
 		SimpleFormModel formModel = getFormModel(formId);
 		Map<String, Object> htmlmodel = new HashMap<String, Object>();
-		htmlmodel.put("pageTitle", "TestPage");
+		htmlmodel.put("pageTitle", "Wizard");
 		return formRenderer.getHtmlForm(formModel, htmlmodel);
+	}
+	
+	public String getFormByKey(String formKey) throws FormServiceException {
+		return getFormById(getByKey(formKey).getId());
 	}
 
 	public SimpleFormModel getFormModel(String formId) throws FormServiceException {
@@ -68,13 +72,6 @@ public class FormService implements IFormService {
 			throw new FormServiceException("Fail to get JSON from URL: " + formURL, e.getCause());
 		}
 		return new FormJsonConverter().convertToFormModel(testJsonResource);
-	}
-
-	private String FormUrl(String id) throws FormServiceException {
-		if (id == null) {
-			throw new FormServiceException("Null Id Exception");
-		}
-		return String.format("%s/%s/%s/%s", BASE_URL, FORM_REPOSITORY_URL, id, FORM_MODEL_URL);
 	}
 
 	public List<SimpleFormModel> getAll() throws FormServiceException {
@@ -92,9 +89,31 @@ public class FormService implements IFormService {
 			models.add(formModel);
 		}
 		return models;
-
+	}
+	
+	private SimpleFormModel getByKey(String formKey) throws FormServiceException {
+		SimpleFormModel form = null;
+		int version = 0;
+		for (SimpleFormModel formModel : getAll()) {
+			if(formModel.getKey().equals(formKey)) {
+				if(formModel.getVersion()> version) {
+					form = formModel;
+					version = formModel.getVersion();
+				}
+			}
+		}
+		if(form == null) {
+			throw new FormServiceException("Fail to find by formKey");
+		}
+		return form;
 	}
 
+	private String FormUrl(String id) throws FormServiceException {
+		if (id == null) {
+			throw new FormServiceException("Null Id Exception");
+		}
+		return String.format("%s/%s/%s/%s", BASE_URL, FORM_REPOSITORY_URL, id, FORM_MODEL_URL);
+	}
 	private String AllFormsURL() {
 		return String.format("%s/%s", BASE_URL, FORM_REPOSITORY_URL);
 	}

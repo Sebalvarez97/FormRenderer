@@ -56,6 +56,14 @@ public class JsonRendererApplicationTests {
 	}
 
 	@Test
+	public void testGetFormByKey() throws Exception {
+		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
+		System.out.println("---------FORM KEY " + formModel.getKey());
+		String HtmlModel = formService.getFormByKey(formModel.getKey());
+		assertNotNull(HtmlModel);
+	}
+	
+	@Test
 	public void testGetForm() throws Exception {
 		//System.out.println("--------------------HTML-------------------");
 		//System.out.println("-------------------------------------------");

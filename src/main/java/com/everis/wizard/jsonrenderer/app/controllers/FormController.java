@@ -28,7 +28,7 @@ public class FormController {
 		}
 	}
 	
-	@GetMapping(path = "/form/{formkey}")
+	@GetMapping(path = "/form/key/{formKey}")
 	public @ResponseBody ResponseEntity<String> getFormByKey(@PathVariable String formKey) {
 		try {
 			String form = formService.getFormByKey(formKey);

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -59,7 +60,7 @@ public class JsonRendererApplicationTests {
 	public void testGetFormByKey() throws Exception {
 		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
 		System.out.println("---------FORM KEY " + formModel.getKey());
-		String HtmlModel = formService.getFormByKey(formModel.getKey());
+		String HtmlModel = formService.getFormByKey(formModel.getKey(), new HashMap<String, Object>());
 		assertNotNull(HtmlModel);
 	}
 	
@@ -67,9 +68,9 @@ public class JsonRendererApplicationTests {
 	public void testGetForm() throws Exception {
 		//System.out.println("--------------------HTML-------------------");
 		//System.out.println("-------------------------------------------");
-		String HtmlModel = formService.getFormById(FORM_ID);
+		String HtmlModel = formService.getFormById(FORM_ID, new HashMap<String, Object>());
 		assertNotNull(HtmlModel);
-		//System.out.println(HtmlModel);
+		System.out.println(HtmlModel);
 		//System.out.println("--------------------------------------------");
 		//System.out.println("--------------------------------------------");
 	}

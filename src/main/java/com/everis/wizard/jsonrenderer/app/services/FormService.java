@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.everis.wizard.jsonrenderer.app.converter.FormJsonConverter;
+import com.everis.wizard.jsonrenderer.app.dtos.FormRequestDto;
 import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
 import com.everis.wizard.jsonrenderer.app.services.exceptions.FormServiceException;
 import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
@@ -25,7 +26,7 @@ public class FormService implements IFormService {
 	@Autowired
 	private FormRenderer formRenderer;
 
-	@Value("${application.formservice.baseUrl}")
+	@Value("${application.formservice.flowableUrl}")
 	private String BASE_URL;
 
 	@Value("${application.formservice.formRepositoryURL}")
@@ -34,35 +35,48 @@ public class FormService implements IFormService {
 	@Value("${application.formservice.modelUrl}")
 	private String FORM_MODEL_URL;
 	
+	@Value("${application.formservice.flowable.user}")
+	private String FLOWABLE_USER;
+	
+	@Value("${application.formservice.flowable.password}")
+	private String FLOWABLE_PASS;
+	
+	
 	/*
-	 Gets a SimpleFormModel and a Map of Attributes
-	 Attributes:
-	 	obligatory:
-	 		pageTitle: title of the page (String)
-	 	optional:
-	 		stylesheets: List of style sheets sources to add (String)
-	 		scripts: List of scripts to use as String (List<String>)
-	 		scriptSrc: List of script sources to add (List<String>)
-	 		
-	 		submitbuttonClass: class to set in the submit button (String)
-	 		submitbuttonAction: action to set in the submit button (String)
-	 		submitbuttonMethod: method to set in the submit button (String)
-	 		
-	 		formClass: class to set in the submit button (String)
-	 		formAction: action to set in the submit button (String)
-	 		formMethod: method to set in the submit button (String)
-	*/
-	public String getFormById(String formId) throws FormServiceException {
+	 * Returns a HtmlForm by formId using a Map<String, Object> (parameter,value)
+	 * Paramaters:
+	 	* (String) formId
+	 * (non-Javadoc)
+	 * @see com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService#getFormById(java.lang.String)
+	 */
+	public String getFormById(String formId, Map<String, Object> model) throws FormServiceException {
 		SimpleFormModel formModel = getFormModel(formId);
 		Map<String, Object> htmlmodel = new HashMap<String, Object>();
-		htmlmodel.put("pageTitle", "Wizard");
-		return formRenderer.getHtmlForm(formModel, htmlmodel);
+			List<String> scripts = new ArrayList<String>();
+			List<String> scriptsrc = new ArrayList<String>();
+				scriptsrc.add("/src/main/resources/static/js/scripts.js");
+				scripts.add("function myFunction(){alert()}");
+			//htmlmodel.put("formMethod", "post");
+			//htmlmodel.put("formAction", "/form-renderer/form/save");
+			//htmlmodel.put("scripts", scripts);s
+			//htmlmodel.put("formOnsubmit", "myFunction()");
+		return formRenderer.getHtmlForm("Wizard", formModel, htmlmodel);
 	}
 	
-	public String getFormByKey(String formKey) throws FormServiceException {
-		return getFormById(getByKey(formKey).getId());
+	/*
+	 * Returns a htmlform(String) by a formKey(String)
+	 * (non-Javadoc)
+	 * @see com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService#getFormByKey(java.lang.String)
+	 */
+	public String getFormByKey(String formKey, Map<String, Object> model) throws FormServiceException {
+		return getFormById(getByKey(formKey).getId(), model);
 	}
 
+	/*
+	 * Returns a SimpleFormModel by a formId (String)
+	 * (non-Javadoc)
+	 * @see com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService#getFormModel(java.lang.String)
+	 */
 	public SimpleFormModel getFormModel(String formId) throws FormServiceException {
 		String testJsonResource = null;
 		String formURL = FormUrl(formId);
@@ -74,13 +88,18 @@ public class FormService implements IFormService {
 		return new FormJsonConverter().convertToFormModel(testJsonResource);
 	}
 
+	/*
+	 * Returns a List<SimpleFormModel> with all the Forms in FlowableRepository
+	 * (non-Javadoc)
+	 * @see com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService#getAll()
+	 */
 	public List<SimpleFormModel> getAll() throws FormServiceException {
 		List<SimpleFormModel> models = new ArrayList<SimpleFormModel>();
 		HttpResponse<JsonNode> result;
 		try {
 			result = Unirest.get(AllFormsURL()).asJson();
 		} catch (UnirestException e) {
-			throw new FormServiceException("Fail to get JSON Array", e.getCause());
+			throw new FormServiceException("Fail to get JSON Array from URL: " + AllFormsURL(), e.getCause());
 		}
 		JSONArray arr = (JSONArray) result.getBody().getObject().get("data");
 		for (int i = 0; i < arr.length(); i++) {
@@ -91,6 +110,18 @@ public class FormService implements IFormService {
 		return models;
 	}
 	
+	/*
+	 * Returns a html after saving the Form
+	 * (non-Javadoc)
+	 * @see com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService#saveForm(com.everis.wizard.jsonrenderer.app.dtos.FormRequestDto)
+	 */
+	public String saveForm(FormRequestDto dto) throws FormServiceException {
+		return formRenderer.getHtmlForm("Wizard", dto, new HashMap<String,Object>());
+	}
+	
+	/*
+	 * Returns a SimpleFormModel by a formKey (String)
+	 */
 	private SimpleFormModel getByKey(String formKey) throws FormServiceException {
 		SimpleFormModel form = null;
 		int version = 0;
@@ -107,14 +138,31 @@ public class FormService implements IFormService {
 		}
 		return form;
 	}
+	
+	/*
+	 * Returns the Flowable baseUrl
+	 */
+	private String getBaseUrl() {
+		return String.format(BASE_URL, FLOWABLE_USER, FLOWABLE_PASS);
+	}
 
+	/*
+	 * Returns the Url to use in a HttpRequest
+	 	* Gets the formModel by the id
+	 */
 	private String FormUrl(String id) throws FormServiceException {
 		if (id == null) {
 			throw new FormServiceException("Null Id Exception");
 		}
-		return String.format("%s/%s/%s/%s", BASE_URL, FORM_REPOSITORY_URL, id, FORM_MODEL_URL);
+		return String.format("%s/%s/%s/%s", getBaseUrl(), FORM_REPOSITORY_URL, id, FORM_MODEL_URL);
 	}
+	
+	/*
+	 * Returns the Url for a HttpRequest
+	 	* Gets the last version of all forms
+	 */
 	private String AllFormsURL() {
-		return String.format("%s/%s", BASE_URL, FORM_REPOSITORY_URL);
+		return String.format("%s/%s",getBaseUrl(), FORM_REPOSITORY_URL + "?latest=true");
 	}
+
 }

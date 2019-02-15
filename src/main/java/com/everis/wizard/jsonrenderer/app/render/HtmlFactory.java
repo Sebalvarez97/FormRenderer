@@ -30,7 +30,7 @@ public class HtmlFactory {
 	public static Tag scripts(List<String> scripts) {
 		return div(
 					each(scripts, script ->
-						script(script)
+						script(script).withType("text/javascript")
 							)
 				);
 	}

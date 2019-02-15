@@ -2,22 +2,23 @@ package com.everis.wizard.jsonrenderer.app.render;
 import static j2html.TagCreator.br;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
-import static j2html.TagCreator.input;
-import static j2html.TagCreator.label;
-import static j2html.TagCreator.option;
-import static j2html.TagCreator.select;
-import static j2html.TagCreator.textarea;
-import static j2html.TagCreator.script;
-import static j2html.TagCreator.link;
-
-import java.util.List;
-
 import static j2html.TagCreator.h1;
 import static j2html.TagCreator.h2;
 import static j2html.TagCreator.h3;
 import static j2html.TagCreator.h4;
 import static j2html.TagCreator.h5;
 import static j2html.TagCreator.h6;
+import static j2html.TagCreator.input;
+import static j2html.TagCreator.label;
+import static j2html.TagCreator.link;
+import static j2html.TagCreator.option;
+import static j2html.TagCreator.script;
+import static j2html.TagCreator.select;
+import static j2html.TagCreator.textarea;
+
+import java.util.List;
+
+import org.thymeleaf.spring5.expression.Fields;
 
 import com.everis.wizard.jsonrenderer.app.model.ExpressionFormField;
 import com.everis.wizard.jsonrenderer.app.model.FormField;
@@ -73,62 +74,51 @@ public class HtmlFactory {
 	}
 	
 	private static Tag dropdown(OptionFormField field) {
-		return div(
-				inputTitle(field),
-				 select(
+		return select(
 						 each(field.getOptions(), option ->
 						 		option(option.getName())
 						 		.withValue(option.getName())
 						 		.withName(field.getName())
 								 )
 						 ).withCondRequired(field.isRequired())
-				 		.withValue((String) field.getValue())
-				);
+				 		.withValue((String) field.getValue());
 	} 
 	
-	private static Tag inputTitle(FormField field) {
-		return div(
-				label(field.getName())
-				 .attr("for",field.getId())
-				 ,br());
+	public static Tag inputTitle(FormField field) {
+		return label(field.getName())
+				 .attr("for",field.getId());
 	}
 	
 	private static Tag textArea(FormField field) {
-		return div(
-				inputTitle(field),
-				 textarea()
-				 .withCondRequired(field.isRequired())
-				);
+		return textarea()
+				 .withCondRequired(field.isRequired());
 	}
 	//CAMBIAR POR h1 o h2 o h3
 	private static Tag expression(ExpressionFormField field) {
 		if(field.getParam("size") != null) {
 			switch((String) field.getParam("size")) {
 			case "1":
-				return h6(field.getExpression());
+				return h6((String)field.getValue());
 			case "2":
-				return h5(field.getExpression());
+				return h5((String)field.getValue());
 			case "3":
-				return h4(field.getExpression());
+				return h4((String)field.getValue());
 			case "4":
-				return h3(field.getExpression());
+				return h3((String)field.getValue());
 			case "5":
-				return h2(field.getExpression());
+				return h2((String)field.getValue());
 			case "6":
-				return h1(field.getExpression());
+				return h1((String)field.getValue());
 			} 
 		}
-		return div(
-				label((String)field.getValue())
-					.withType(field.getType())
-				);
+		return label((String)field.getValue())
+					.withType(field.getType());
 	}
 	
 	private static Tag radiobutton(OptionFormField field) {
 		field.setType("radio");
 		return div(
-				inputTitle(field),
-					 each(field.getOptions(), option ->
+				each(field.getOptions(), option ->
 				 		div(
 				 			input()
 						 		.withType(field.getType())
@@ -153,9 +143,7 @@ public class HtmlFactory {
 	}
 	
 	private static Tag inputt(FormField field) {
-		return div(
-				inputTitle(field),
-				 input()
+		return input()
 					.withType(field.getType())
    			        .withPlaceholder(field.getPlaceholder())
    			        .withCondTitle(field.getParam("mask") != null, (String) field.getParam("mask"))
@@ -167,8 +155,7 @@ public class HtmlFactory {
    					        		field.getParam("maxLength") != null,
    					        		"maxlenght", (String) field.getParam("maxLength"))
    			        .withCondRequired(field.isRequired())
-   			        .withValue((String) field.getValue())
-			);
+   			        .withCondValue(field.getValue() != null, (String) field.getValue());
 	}
 	
 }

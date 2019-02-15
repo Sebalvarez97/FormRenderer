@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.everis.wizard.jsonrenderer.app.dtos.FormRequestDto;
+import com.everis.wizard.jsonrenderer.app.model.FormField;
+import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
+import com.everis.wizard.jsonrenderer.app.services.exceptions.FormServiceException;
 import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 
 @Controller
@@ -48,15 +50,34 @@ public class FormController {
 		}
 	}
 	
-	@GetMapping(path = "/form")
-	public @ResponseBody ResponseEntity<String> getForm(Map<String, Object> model) {
+	@GetMapping(path = "/formwea/{formId}")
+	public String getTemplateById(@PathVariable String formId, Map<String, Object> model) {
 		try {
-				return ResponseEntity
-						.ok()
-						.body("form");
-			
-		}catch(Exception ex) {
-			return ResponseEntity.status(204).build();
+			return formService.writeHtmlFormById("newForm", formId, model);
+		} catch (FormServiceException e) {
+			e.printStackTrace();
+			return "formError";
 		}
+	}
+	
+	@GetMapping(path = "/formwea/key/{formKey}")
+	public String getTemplateByKey(@PathVariable String formKey, Map<String, Object> model) {
+		try {
+			return formService.writeHtmlFormByKey("keyform", formKey, model);
+		} catch (FormServiceException e) {
+			e.printStackTrace();
+			return "formError";
+		}
+	}
+	
+	@PostMapping(path = "/form/save")
+	public String saveForm(SimpleFormModel form) {
+		System.out.println("SAVING");
+		for (FormField field : form.getFields()) {
+			System.out.println(field.getId());
+			System.out.println(field.getName());
+			System.out.println(field.getValue());
+		}
+		return "formError";
 	}
 }

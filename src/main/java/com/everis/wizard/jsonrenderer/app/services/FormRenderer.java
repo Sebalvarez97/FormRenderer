@@ -2,11 +2,13 @@ package com.everis.wizard.jsonrenderer.app.services;
 
 import org.springframework.stereotype.Service;
 
-import com.everis.wizard.jsonrenderer.app.dtos.FormRequestDto;
+import com.everis.wizard.jsonrenderer.app.model.FormField;
 import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
 import static  com.everis.wizard.jsonrenderer.app.render.HtmlFactory.*;
 import static j2html.TagCreator.*;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +67,7 @@ public class FormRenderer {
 	                					each(formModel.getFields(), field ->
             									formfield(field)
             									.withCondClass(pageAttr.get("formFieldClass") != null, (String) pageAttr.get("formFieldClass"))
+            									.attr("th:field", String.format("*{fieldsmap['%s'].value}", field.getId()))
                 							),
 	                					br(),
 	                					input()
@@ -78,6 +81,7 @@ public class FormRenderer {
 	                								  (String) pageAttr.get("submitbuttonMethod"))
 	                					)
 		                			.withId(formModel.getId())
+		                			.attr("th:object", "${form}")
 		                			.withCondAction(pageAttr.get("formAction") != null, (String) pageAttr.get("formAction"))
 		                			.withCondClass(pageAttr.get("formClass") != null,
   								  			(String) pageAttr.get("formClass"))
@@ -93,8 +97,8 @@ public class FormRenderer {
 	            )
 	        );
 		}
-	
-	public String getHtmlForm(String pageTitle, FormRequestDto formModel, Map<String, Object> pageAttr) {
+
+	public String getHtmlTemplate(String pageTitle, SimpleFormModel formModel, Map<String, Object> pageAttr) {
 		if(pageAttr.get("scripts") == null) {
 			pageAttr.put("scripts", new ArrayList<String>());
 		}
@@ -103,10 +107,11 @@ public class FormRenderer {
 		}
 		if(pageAttr.get("stylesheets") == null) {
 			pageAttr.put("stylesheets", new ArrayList<String>());
-		}		
+		}
 		return document(
 	            html(
 	                head(
+	                	meta().attr("charset", "UTF-8"),
 	                    title(pageTitle),
                 		scripts((List<String>)pageAttr.get("scripts")),
                     	scriptSrc((List<String>)pageAttr.get("scriptSrc")),
@@ -116,15 +121,19 @@ public class FormRenderer {
 	                    header(
 	                    	h2(formModel.getName())
 	                    ),
-	                   
-	                        //the view from the partials example
 	                		div(
 	                			form()
 	                				.with(
 	                					each(formModel.getFields(), field ->
-            									formfield(field)
-            									.withCondClass(pageAttr.get("formFieldClass") != null, (String) pageAttr.get("formFieldClass"))
+	                							div(
+	                									inputTitle(field),
+	                									br(),
+	                									formfield(field)
+	                									.withCondClass(pageAttr.get("formFieldClass") != null, (String) pageAttr.get("formFieldClass"))
+	                									//.attr("th:field", String.format("*{fieldsmap['%s'].value}",field.getId()))
+                									)            									
                 							),
+	                					br(),
 	                					input()
 	                						  .withType("submit")
 	                						  .withValue("Enter")
@@ -136,6 +145,8 @@ public class FormRenderer {
 	                								  (String) pageAttr.get("submitbuttonMethod"))
 	                					)
 		                			.withId(formModel.getId())
+		                			.condAttr(pageAttr.get("formAction") != null,"th:action",String.format("@{%s}",pageAttr.get("formAction")))
+		                			.condAttr(pageAttr.get("form") != null, "th:object", "${form}")
 		                			.withCondAction(pageAttr.get("formAction") != null, (String) pageAttr.get("formAction"))
 		                			.withCondClass(pageAttr.get("formClass") != null,
   								  			(String) pageAttr.get("formClass"))
@@ -149,7 +160,7 @@ public class FormRenderer {
 	                    )
 	                )
 	            )
+	            .attr("xmlns:th", "http://www.thymeleaf.org")
 	        );
-		}
-		
+	}
 }

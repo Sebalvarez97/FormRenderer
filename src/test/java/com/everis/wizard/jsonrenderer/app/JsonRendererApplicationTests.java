@@ -19,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.everis.wizard.jsonrenderer.app.model.FormField;
 import com.everis.wizard.jsonrenderer.app.model.SimpleFormModel;
+import com.everis.wizard.jsonrenderer.app.services.FormRenderer;
+import com.everis.wizard.jsonrenderer.app.services.HtmlManager;
 import com.everis.wizard.jsonrenderer.app.services.exceptions.FormServiceException;
 import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 
@@ -28,6 +30,12 @@ public class JsonRendererApplicationTests {
 
 	@Autowired
 	private IFormService formService;
+	
+	@Autowired
+	private FormRenderer formRenderer;
+	
+	@Autowired
+	private HtmlManager htmlManager;
 
 	private static String FORM_ID = null;
 	
@@ -73,6 +81,14 @@ public class JsonRendererApplicationTests {
 		System.out.println(HtmlModel);
 		//System.out.println("--------------------------------------------");
 		//System.out.println("--------------------------------------------");
+	}
+	
+	@Test
+	public void testTh() throws Exception {
+		SimpleFormModel formModel = formService.getFormModel(FORM_ID);
+		String formRendReturn = formRenderer.getHtmlTemplate("Wizard", formModel, new HashMap<String, Object>());
+		System.out.println(formRendReturn);
+		htmlManager.writeTemplate(formRendReturn, "testform");
 	}
 
 	protected void printForm(SimpleFormModel model) {

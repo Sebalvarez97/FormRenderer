@@ -102,24 +102,26 @@ public class HtmlFactory {
 	}
 	//CAMBIAR POR h1 o h2 o h3
 	private static Tag expression(ExpressionFormField field) {
+		
+		String value = (String)field.getValue();
 		if(field.getParam("size") != null) {
 			switch((String) field.getParam("size")) {
 			case "1":
-				return h6(field.getExpression());
+				return h6(value);
 			case "2":
-				return h5(field.getExpression());
+				return h5(value);
 			case "3":
-				return h4(field.getExpression());
+				return h4(value);
 			case "4":
-				return h3(field.getExpression());
+				return h3(value);
 			case "5":
-				return h2(field.getExpression());
+				return h2(value);
 			case "6":
-				return h1(field.getExpression());
+				return h1(value);
 			} 
 		}
 		return div(
-				label(field.getExpression())
+				label(value)
 					.withType(field.getType())
 				);
 	}

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.everis.wizard.jsonrenderer.app.dtos.ProcessRequestDto;
+import com.everis.wizard.jsonrenderer.app.dtos.TaskResponseDto;
 import com.everis.wizard.jsonrenderer.app.services.ProcessService;
 import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 
@@ -69,6 +70,43 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 			
 			try {
 				String form = processService.CreateProcess(pdto);
+				System.out.println("ok" + form);
+				
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				System.out.println("not ok");
+				return ResponseEntity.status(204).build();
+			}
+			
+		}
+		
+		@PostMapping(path = "/complete/{taskId}")
+		public @ResponseBody ResponseEntity<String> completeTask(@PathVariable String taskId, @RequestBody TaskResponseDto tdto){
+			System.out.println("complete task + " + taskId);
+			
+			try {
+				String form = processService.SubmitTaskResults(taskId, tdto);
+				System.out.println("ok" + form);
+				
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				System.out.println("not ok");
+				return ResponseEntity.status(204).build();
+			}
+			
+		}
+		
+		
+		@GetMapping(path = "/getForm/{processInstanceId}")
+		public @ResponseBody ResponseEntity<String> completeTask(@PathVariable String processInstanceId){
+			System.out.println("complete task + " + processInstanceId);
+			
+			try {
+				String form = processService.GetNextForm(processInstanceId);
 				System.out.println("ok" + form);
 				
 				return ResponseEntity

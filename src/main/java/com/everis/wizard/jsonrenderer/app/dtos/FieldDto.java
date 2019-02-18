@@ -1,17 +1,16 @@
 package com.everis.wizard.jsonrenderer.app.dtos;
 
-import java.io.Serializable;
 
-public class FieldDTO  {
+public class FieldDto  {
 	public String name;
 	public String type;
 	public String value;
 
-	public FieldDTO(){
+	public FieldDto(){
 		
 	}
 	
-	public FieldDTO(String name, String type, String value) {
+	public FieldDto(String name, String type, String value) {
 		super();
 		this.name = name;
 		this.type = type;

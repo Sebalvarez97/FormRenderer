@@ -84,8 +84,7 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 		
 		@PostMapping(path = "/complete/{taskId}")
 		public @ResponseBody ResponseEntity<String> completeTask(@PathVariable String taskId, @RequestBody TaskResponseDto tdto){
-			System.out.println("complete task + " + taskId);
-			
+		
 			try {
 				String form = processService.SubmitTaskResults(taskId, tdto);
 				System.out.println("ok" + form);
@@ -101,8 +100,26 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 		}
 		
 		
+		@GetMapping(path = "/getTaskForm/{taskId}")
+		public @ResponseBody ResponseEntity<String> getFormByTaskId(@PathVariable String taskId){
+			System.out.println("getTaskForm + " + taskId);
+			
+			try {
+				String form = processService.GetFormByTaskId(taskId);
+				System.out.println("ok" + form);
+				
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				System.out.println("not ok");
+				return ResponseEntity.status(204).build();
+			}
+			
+		}
+			
 		@GetMapping(path = "/getForm/{processInstanceId}")
-		public @ResponseBody ResponseEntity<String> completeTask(@PathVariable String processInstanceId){
+		public @ResponseBody ResponseEntity<String> getFormByProcessId(@PathVariable String processInstanceId){
 			System.out.println("complete task + " + processInstanceId);
 			
 			try {

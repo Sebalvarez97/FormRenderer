@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,16 @@ public class FormService implements IFormService {
 		
 	}
 	
+	
+	public String convertForm(String formBody) {
+		
+		SimpleFormModel sfm = new FormJsonConverter().convertToFormModel(formBody);
+		Map<String, Object> htmlmodel = new HashMap<String, Object>();
+		htmlmodel.put("pageTitle", "Wizard");
+		return formRenderer.getHtmlForm(sfm, htmlmodel);
+		
+	}
+	
 	public SimpleFormModel getFormModelByTaskId(String taskId) throws FormServiceException{
 		
 		String testJsonResource = null;
@@ -98,6 +109,8 @@ public class FormService implements IFormService {
 		return new FormJsonConverter().convertToFormModel(testJsonResource);
 	}
 
+	
+	
 	public List<SimpleFormModel> getAll() throws FormServiceException {
 		List<SimpleFormModel> models = new ArrayList<SimpleFormModel>();
 		HttpResponse<JsonNode> result;

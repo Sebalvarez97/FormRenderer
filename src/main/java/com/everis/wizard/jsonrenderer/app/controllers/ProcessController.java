@@ -23,45 +23,7 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 		@Autowired
 		private ProcessService processService;
 		
-		@GetMapping(path = "/getall")
-		public @ResponseBody ResponseEntity<String> getAll() {		
-			
-			try {
-				String form = processService.GetAll();
-				return ResponseEntity
-						.ok()
-						.body(form);
-			}catch(Exception ex) {
-				return ResponseEntity.status(204).build();
-			}
-		}
 		
-		@GetMapping(path = "/getall/{key}")
-		public @ResponseBody ResponseEntity<String> getAll(@PathVariable String key) {
-			
-			
-			try {
-				String form = processService.GetAll(key);
-				return ResponseEntity
-						.ok()
-						.body(form);
-			}catch(Exception ex) {
-				return ResponseEntity.status(204).build();
-			}
-		}
-		
-		@GetMapping(path = "/getlatest/{key}")
-		public @ResponseBody ResponseEntity<String> getLatest(@PathVariable String key) {
-						
-			try {
-				String form = processService.GetLatest (key);
-				return ResponseEntity
-						.ok()
-						.body(form);
-			}catch(Exception ex) {
-				return ResponseEntity.status(204).build();
-			}
-		}
 		
 		@PostMapping(path = "/create/")
 		public @ResponseBody ResponseEntity<String> createProcess(@RequestBody ProcessRequestDto pdto)
@@ -70,6 +32,26 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 			
 			try {
 				String form = processService.CreateProcess(pdto);
+				System.out.println("ok" + form);
+				
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				System.out.println("not ok");
+				return ResponseEntity.status(204).build();
+			}
+			
+		}
+		
+		@GetMapping(path = "/create/{processKey}")
+		public @ResponseBody ResponseEntity<String> createProcess(@PathVariable String processKey)
+		{
+			System.out.println("Perro");
+			
+			try {
+				//String form = processService.CreateProcess(pdto);
+				String form = processService.GetInitialFormOrStartProcess(processKey);
 				System.out.println("ok" + form);
 				
 				return ResponseEntity
@@ -100,6 +82,8 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 		}
 		
 		
+		//no se usa
+		/*
 		@GetMapping(path = "/getTaskForm/{taskId}")
 		public @ResponseBody ResponseEntity<String> getFormByTaskId(@PathVariable String taskId){
 			System.out.println("getTaskForm + " + taskId);
@@ -117,7 +101,9 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 			}
 			
 		}
-			
+		*/	
+
+		/*
 		@GetMapping(path = "/getForm/{processInstanceId}")
 		public @ResponseBody ResponseEntity<String> getFormByProcessId(@PathVariable String processInstanceId){
 			System.out.println("complete task + " + processInstanceId);
@@ -135,5 +121,49 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 			}
 			
 		}
+		*/
 		
+		/*
+		@GetMapping(path = "/getall")
+		public @ResponseBody ResponseEntity<String> getAll() {		
+			
+			try {
+				String form = processService.GetAll();
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				return ResponseEntity.status(204).build();
+			}
+		}
+		*/
+		/*
+		@GetMapping(path = "/getall/{key}")
+		public @ResponseBody ResponseEntity<String> getAll(@PathVariable String key) {
+			
+			
+			try {
+				String form = processService.GetAll(key);
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				return ResponseEntity.status(204).build();
+			}
+		}
+		*/
+		/*
+		@GetMapping(path = "/getlatest/{key}")
+		public @ResponseBody ResponseEntity<String> getLatest(@PathVariable String key) {
+						
+			try {
+				String form = processService.GetLatest (key);
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				return ResponseEntity.status(204).build();
+			}
+		}
+		*/
 }

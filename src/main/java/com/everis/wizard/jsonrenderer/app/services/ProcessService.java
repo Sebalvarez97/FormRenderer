@@ -22,6 +22,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+
+
+
 @Service
 public class ProcessService {
 
@@ -41,6 +44,94 @@ public class ProcessService {
 	@Autowired
 	private FormService formService;
 
+	
+	//CONTROLLER METHODS
+	
+	public String SubmitTaskResults(String taskId, TaskResponseDto tdto) {
+		
+		System.out.println("Submit Task Results " + taskId);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json = "";
+		
+		
+		String pid = GetProcessInstanceIdFromTaskId(taskId); 
+		System.out.println("Process Instance Id " + pid);
+		try {
+
+			json = mapper.writeValueAsString(tdto);
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		HttpResponse<JsonNode> result = null;
+		try {		
+			JSONObject obj = new JSONObject(json);
+			result = Unirest.post(UrlSubmitTask(taskId)).header("Content-Type", "application/json").body(obj).asJson();
+
+			
+			
+			String nextTask = GetCurrentTaskId(pid);		
+			System.out.println("Next Task Id " + nextTask);
+			
+			if(nextTask == "Error")
+				return "The process has been finished or some other thing with task ocurred";
+		
+			String form = formService.getFormByTaskId(nextTask);
+			
+			if(form == "Error")
+				return "The process has been finished or some other thing with form ocurred";
+			
+			return  "Task ID " + nextTask + "\n" + form;
+
+		} catch (Exception e) {
+
+			System.out.println("Exceptiion e " + e);
+			return "";
+			// throw new FormServiceException("Fail to get JSON Array", e.getCause());
+		}
+
+	}
+		
+	public String GetInitialFormOrStartProcess(String processKey) {
+		
+		HttpResponse<JsonNode> result = null;
+		
+		try {
+			System.out.println(UrlProcessDefinitions());
+			result = Unirest.get(UrlProcessDefinitions() + "?key=" + processKey + "&latest=" + true).asJson();
+			
+			JSONArray arr = (JSONArray) result.getBody().getObject().get("data");
+			
+			if(arr.length() == 0)
+				return "No process definitions found with that key";
+			
+			String formDefined = arr.getJSONObject(0).get("startFormDefined").toString();
+			String processId = arr.getJSONObject(0).get("id").toString();
+			
+			
+			if(formDefined == "true")
+			{				
+				result = Unirest.get(UrlStartForm(processId)).asJson();
+				
+				return formService.convertForm(result.getBody().getObject().toString());
+			}
+			else 
+			{
+				System.out.println("Form not Defined");
+				return CreateProcess(new ProcessRequestDto(processKey));
+			}	
+				
+		} catch (UnirestException e) {
+			System.out.println("Exceptiion e " + e);
+			// throw new FormServiceException("Fail to get JSON Array", e.getCause());
+		}
+
+		return result.getBody().toString();
+		
+	}
+		
 	public String CreateProcess(ProcessRequestDto pdto) {
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -82,17 +173,10 @@ public class ProcessService {
 
 	}
 
-	public String GetFormByTaskId(String taskId) {
-		try {
-			return formService.getFormByTaskId(taskId);
-		} catch (FormServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "Error Ocurred";
-	}
+	
+	//PRIVATE METHODS
 
-	String GetCurrentTaskId(String processInstanceId) {
+	private String GetCurrentTaskId(String processInstanceId) {
 
 		HttpResponse<JsonNode> result2 = null;
 		String taskId = "null";
@@ -102,20 +186,21 @@ public class ProcessService {
 
 			JSONArray arr = (JSONArray) result2.getBody().getObject().get("data");
 
+			if(arr.length() == 0)
+				return "Error";
+			
 			System.out.println(arr.getJSONObject(0).toString());
-
 			taskId = arr.getJSONObject(0).get("id").toString();
 
 			return taskId;
 		} catch (UnirestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "Error";
 		}
-
-		return taskId;
 	}
 
-	String GetProcessInstanceIdFromTaskId(String taskId) {
+	private String GetProcessInstanceIdFromTaskId(String taskId) {
 		HttpResponse<JsonNode> result = null;
 		try {
 		
@@ -126,10 +211,49 @@ public class ProcessService {
 			return result.getBody().getObject().getString("processInstanceId");
 		} catch (Exception e) {
 			System.out.println(e);
-		}
-		return result.toString();
+			return "Error";
+			
+		}	
 	}
 
+	//URLS GENERATORS
+	
+	private String UrlSubmitTask(String taskId) {
+		return String.format("%s/%s/%s", BASE_URL, GETTASK_URL, taskId);
+	}
+
+	private String UrlGetTaskInstanceID() {
+		return String.format("%s/%s", BASE_URL, GETTASK_URL);
+	}
+
+	private String UrlStartForm(String processId) {
+		return String.format("%s/%s/%s/%s", BASE_URL, ALLPROCESS_URL, processId, START_FORM_URL);
+	}
+
+	String UrlCreateProcess() {
+		return String.format("%s/%s", BASE_URL, CREATE_PROCESS_URL);
+	}
+
+	private String UrlProcessDefinitions() {
+		return String.format("%s/%s", BASE_URL, ALLPROCESS_URL);
+	}
+	
+	
+	
+
+	/*
+	public String GetFormByTaskId(String taskId) {
+		try {
+			return formService.getFormByTaskId(taskId);
+		} catch (FormServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "Error Ocurred";
+	}
+	*/
+	
+	/*
 	public String GetNextForm(String processInstanceId) {
 
 		try {
@@ -143,48 +267,12 @@ public class ProcessService {
 		return "Some error ocurred";
 	}
 
-	public String SubmitTaskResults(String taskId, TaskResponseDto tdto) {
-		
-		System.out.println("Submit Task Results " + taskId);
-		
-		ObjectMapper mapper = new ObjectMapper();
-		String json = "";
-		
-		
-		String pid = GetProcessInstanceIdFromTaskId(taskId); 
-		System.out.println("Process Instance Id " + pid);
-		try {
-
-			json = mapper.writeValueAsString(tdto);
-		} catch (JsonProcessingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		HttpResponse<JsonNode> result = null;
-		try {		
-			JSONObject obj = new JSONObject(json);
-			result = Unirest.post(UrlSubmitTask(taskId)).header("Content-Type", "application/json").body(obj).asJson();
-
-			
-			
-			String nextTask = GetCurrentTaskId(pid);			
-			System.out.println("Next Task Id " + nextTask);
-			
-			return formService.getFormByTaskId(nextTask);
-
-		} catch (Exception e) {
-
-			System.out.println("Exceptiion e " + e);
-			return "";
-			// throw new FormServiceException("Fail to get JSON Array", e.getCause());
-		}
-
-	}
+	
+	*/
 
 	
 	
-	
+	/*
 	// Get all Process Definitions
 	public String GetAll() {
 
@@ -234,24 +322,5 @@ public class ProcessService {
 
 		return result.getBody().toString();
 	}
-
-	String UrlSubmitTask(String taskId) {
-		return String.format("%s/%s/%s", BASE_URL, GETTASK_URL, taskId);
-	}
-
-	String UrlGetTaskInstanceID() {
-		return String.format("%s/%s", BASE_URL, GETTASK_URL);
-	}
-
-	String UrlStartForm(String processId) {
-		return String.format("%s/%s/%s/%s", BASE_URL, ALLPROCESS_URL, processId, START_FORM_URL);
-	}
-
-	String UrlCreateProcess() {
-		return String.format("%s/%s", BASE_URL, CREATE_PROCESS_URL);
-	}
-
-	String UrlProcessDefinitions() {
-		return String.format("%s/%s", BASE_URL, ALLPROCESS_URL);
-	}
+	*/
 }

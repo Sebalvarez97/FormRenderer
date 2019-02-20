@@ -174,6 +174,48 @@ public class ProcessService {
 	}
 
 	
+	public String CreateProcess(String processKey, ProcessRequestDto pdto) {
+
+		ObjectMapper mapper = new ObjectMapper();
+		pdto.setProcessDefinitionKey(processKey);
+		String json = "";
+		try {
+
+			json = mapper.writeValueAsString(pdto);
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		HttpResponse<JsonNode> result = null;
+		try {
+			System.out.println(UrlCreateProcess());
+
+			System.out.println(json);
+
+			JSONObject obj = new JSONObject(json);
+			System.out.println(obj);
+			result = Unirest.post(UrlCreateProcess()).header("Content-Type", "application/json").body(obj).asJson();
+
+			// Obtengo el process Instance ID
+			String pdid = (String) result.getBody().getObject().get("id");
+
+			// Obtengo el task Id del proceso
+			String taskId = GetCurrentTaskId(pdid);
+
+			return  "Task ID " + taskId + "\n" +
+					"Process ID " + pdid + "\n" +
+					formService.getFormByTaskId(taskId);
+
+		} catch (Exception e) {
+
+			System.out.println("Exceptiion e " + e);
+			return "";
+			// throw new FormServiceException("Fail to get JSON Array", e.getCause());
+		}
+
+	}
+	
 	//PRIVATE METHODS
 
 	private String GetCurrentTaskId(String processInstanceId) {
@@ -230,14 +272,14 @@ public class ProcessService {
 		return String.format("%s/%s/%s/%s", BASE_URL, ALLPROCESS_URL, processId, START_FORM_URL);
 	}
 
-	String UrlCreateProcess() {
+	private String UrlCreateProcess() {
 		return String.format("%s/%s", BASE_URL, CREATE_PROCESS_URL);
 	}
 
 	private String UrlProcessDefinitions() {
 		return String.format("%s/%s", BASE_URL, ALLPROCESS_URL);
 	}
-	
+
 	
 	
 

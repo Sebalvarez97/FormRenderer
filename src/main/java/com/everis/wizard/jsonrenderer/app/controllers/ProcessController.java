@@ -43,6 +43,24 @@ import com.everis.wizard.jsonrenderer.app.services.interfaces.IFormService;
 			}
 			
 		}
+		@PostMapping(path = "/create/{key}")
+		public @ResponseBody ResponseEntity<String> createProcess(@PathVariable String key, @RequestBody ProcessRequestDto pdto)
+		{
+			System.out.println("Perro");
+			
+			try {
+				String form = processService.CreateProcess(key, pdto);
+				System.out.println("ok" + form);
+				
+				return ResponseEntity
+						.ok()
+						.body(form);
+			}catch(Exception ex) {
+				System.out.println("not ok");
+				return ResponseEntity.status(204).build();
+			}
+			
+		}
 		
 		@GetMapping(path = "/create/{processKey}")
 		public @ResponseBody ResponseEntity<String> createProcess(@PathVariable String processKey)
